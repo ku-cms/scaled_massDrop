@@ -64,12 +64,11 @@ for event in events:
      jetAK4Phi = jetAK4PhiHandle.product()
      jetAK4E = jetAK4EHandle.product()
      jetAK4Mass = jetAK4MassHandle.product()
-	
-     ak4p4 = ROOT.TLorentzVector()
-     ak4p42 = ROOT.TLorentzVector()
+
      if jetAK4Mass.size() <= 1:
   	  continue
-
+     
+     #Creating ordered dictionary to find max mass at Pt index
      named_map = collections.namedtuple('named_map','mass index')
      map = {}
      for iak4 in range(0, jetAK4Pt.size()):
@@ -84,18 +83,6 @@ for event in events:
      #print maxMass2.index,maxMass2.mass
      maxak4 = maxMass.index
      max2ak4 = maxMass2.index
-     ##map_sorted = (sorted(map.items(), key=itemgetter(1)))
-     #print jetAK4Pt.size()
-     ##for iak4 in range(0, jetAK4Pt.size()):
-          ##if iak4 == 0 and 
-     ##     if jetAK4Mass.at(iak4) > jetAK4Mass.at(maxak4):
-     ##          max2ak4 = maxak4
-     ##          maxak4 = iak4
-     ##     elif jetAK4Mass.at(iak4) > jetAK4Mass.at(max2ak4):
-     ##          max2ak4 = iak4
-     ##     print iak4, jetAK4Mass.at(iak4)
-
-     ##print maxak4,max2ak4,jetAK4Mass.at(maxak4),jetAK4Mass.at(max2ak4)
 	
      maxak4p4 = ROOT.TLorentzVector()
      ak4p4.SetPtEtaPhiE(jetAK4Pt.at(maxak4), jetAK4Eta.at(maxak4), jetAK4Phi.at(maxak4), jetAK4E.at(maxak4))
