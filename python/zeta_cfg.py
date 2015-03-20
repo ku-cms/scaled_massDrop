@@ -44,9 +44,8 @@ f = ROOT.TFile(options.outname, "RECREATE")
 f.cd()
 
 hzetadist = ROOT.TH1D("hzetadist",";#zeta (#deltaR);;",90,0,4.5)
-
-#maxak8p4 = ROOT.TLorentzVector()
-#max2ak8p4 = ROOT.TLorentzVector()
+hzetaHdist = ROOT.TH1D("hzetaHdist","#zeta;;",90,0,4.5)
+hzetaWdist = ROOT.TH1D("hzetaWdist","#zeta;;",90,0,4.5)
 
 i = 1
 for event in events:
@@ -58,6 +57,13 @@ for event in events:
      event.getByLabel (jetAK4Label, jetAK4PhiProduct, jetAK4PhiHandle)
      event.getByLabel (jetAK4Label, jetAK4EProduct, jetAK4EHandle)
      event.getByLabel (jetAK4Label, jetAK4MassProduct, jetAK4MassHandle)
+     event.getByLabel (genLabel, genPtProd, genPtHandle)
+     event.getByLabel (genLabel, genEtaProd, genEtaHandle)
+     event.getByLabel (genLabel, genPhiProd, genPhiHandle)
+     event.getByLabel (genLabel, genEProd, genEHandle)
+     event.getByLabel (genLabel, genIDProd, genIDHandle)
+     event.getByLabel (genLabel, genStatusProd, genStatusHandle)
+     event.getByLabel (genLabel, genMomIDProd, genMomIDHandle)
 
      jetAK4Pt = jetAK4PtHandle.product()
      jetAK4Eta = jetAK4EtaHandle.product()
@@ -65,12 +71,31 @@ for event in events:
      jetAK4E = jetAK4EHandle.product()
      jetAK4Mass = jetAK4MassHandle.product()
 
-     if jetAK4Mass.size() <= 1:
+     genPt = genPtHandle.product()
+     genEta = genEtaHandle.product()
+     genPhi = genPhiHandle.product()
+     genE = genEHandle.product()
+     genID = genIDHandle.product()
+     genStatus = genStatusHandle.product()
+     genMomID = genMomIDHandle.product()
+
+     if jetAK4Pt.size() <= 1:
   	  continue
-     
+     iW = -1
+     ih = -1
+
+     for igen in range(0,genPt.size()):
+          if abs(genID.at(igen)) == 25 and abs(genMomID.at(igen))==6000006:
+               ih = igen
+          if abs(genID.at(igen)) == 24 and abs(genMomID.at(igen)) == 6:
+               iW = igen
+     if ih = -1 and iW = -1:
+          continue
+
      #Creating ordered dictionary to find max mass at Pt index
      named_map = collections.namedtuple('named_map','mass index')
      map = {}
+
      for iak4 in range(0, jetAK4Pt.size()):
           map[iak4] = jetAK4Mass.at(iak4)
 
@@ -84,16 +109,21 @@ for event in events:
      maxak4 = maxMass.index
      max2ak4 = maxMass2.index
 	
-     maxak4p4 = ROOT.TLorentzVector()
+     ak4p4 = ROOT.TLorentzVector()
+     ak4p4_2 = ROOT.TLorentzVector()
+     
      ak4p4.SetPtEtaPhiE(jetAK4Pt.at(maxak4), jetAK4Eta.at(maxak4), jetAK4Phi.at(maxak4), jetAK4E.at(maxak4))
-	
-     max2ak4p4 = ROOT.TLorentzVector()
-     ak4p42.SetPtEtaPhiE(jetAK4Pt.at(max2ak4), jetAK4Eta.at(max2ak4), jetAK4Phi.at(max2ak4), jetAK4E.at(max2ak4))
+     ak4p4_2.SetPtEtaPhiE(jetAK4Pt.at(max2ak4), jetAK4Eta.at(max2ak4), jetAK4Phi.at(max2ak4), jetAK4E.at(max2ak4))
+     
+     invMassVec = ak4p4 + ak4p4_2
 
-     zeta = jetAK4Mass.at(maxak4) / (jetAK4Mass.at(maxak4) + jetAK4Mass.at(max2ak4)) * ak4p4.DeltaR(ak4p42)
+     zeta = jetAK4Mass.at(maxak4) / (invMassVec.M()) * ak4p4.DeltaR(ak4p4_2)
 
      hzetadist.Fill(zeta)
-
+     if ih > -1:
+          hzetaHdist.Fill(zeta)
+     if iW > -1:
+          hzetaWdist.Fill(zeta)
 f.cd()
 #hzetadist.Rebin(1)
 f.Write()	
