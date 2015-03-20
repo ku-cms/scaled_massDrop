@@ -84,6 +84,7 @@ for event in events:
      iW = -1
      ih = -1
 
+     ####determine if higgs or W in event
      for igen in range(0,genPt.size()):
           if abs(genID.at(igen)) == 25 and abs(genMomID.at(igen))==6000006:
                ih = igen
@@ -92,7 +93,7 @@ for event in events:
      if ih = -1 and iW = -1:
           continue
 
-     #Creating ordered dictionary to find max mass at Pt index
+     ####Creating ordered dictionary to find maximum mass at specific Pt index
      named_map = collections.namedtuple('named_map','mass index')
      map = {}
 
@@ -112,11 +113,14 @@ for event in events:
      ak4p4 = ROOT.TLorentzVector()
      ak4p4_2 = ROOT.TLorentzVector()
      
+     ####Set Lorentz vectors for two highest mass jets
      ak4p4.SetPtEtaPhiE(jetAK4Pt.at(maxak4), jetAK4Eta.at(maxak4), jetAK4Phi.at(maxak4), jetAK4E.at(maxak4))
      ak4p4_2.SetPtEtaPhiE(jetAK4Pt.at(max2ak4), jetAK4Eta.at(max2ak4), jetAK4Phi.at(max2ak4), jetAK4E.at(max2ak4))
      
+     ####Set Lorentz vector for invariant dijet mass
      invMassVec = ak4p4 + ak4p4_2
-
+     
+     ####scaled mass drop variable
      zeta = jetAK4Mass.at(maxak4) / (invMassVec.M()) * ak4p4.DeltaR(ak4p4_2)
 
      hzetadist.Fill(zeta)
