@@ -90,7 +90,7 @@ for event in events:
                ih = igen
           if abs(genID.at(igen)) == 24 and abs(genMomID.at(igen)) == 6:
                iW = igen
-     if ih = -1 and iW = -1:
+     if ih == -1 and iW == -1:
           continue
 
      ####Creating ordered dictionary to find maximum mass at specific Pt index
