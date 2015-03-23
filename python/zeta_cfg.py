@@ -40,13 +40,21 @@ jetAK4PhiHandle, jetAK4Label, jetAK4PhiProduct = Handle ("std::vector<float>"), 
 jetAK4EHandle, jetAK4Label, jetAK4EProduct = Handle ("std::vector<float>"), ("jetsAK4"), ("jetAK4E")
 jetAK4MassHandle, jetAK4Label, jetAK4MassProduct = Handle ("std::vector<float>"), ("jetsAK4"), ("jetAK4Mass")
 
+genPtHandle, genLabel, genPtProd = Handle("std::vector<float>"), ("genPart"), ("genPartPt")
+genEtaHandle, genLabel, genEtaProd = Handle("std::vector<float>"), ("genPart"), ("genPartEta")
+genPhiHandle, genLabel, genPhiProd = Handle("std::vector<float>"), ("genPart"), ("genPartPhi")
+genEHandle, genLabel, genEProd = Handle("std::vector<float>"), ("genPart"), ("genPartE")
+genIDHandle, genLabel, genIDProd = Handle("std::vector<float>"), ("genPart"), ("genPartID")
+genStatusHandle, genLabel, genStatusProd = Handle("std::vector<float>"), ("genPart"), ("genPartStatus")
+genMomIDHandle, genLabel, genMomIDProd = Handle("std::vector<float>"), ("genPart"), ("genPartMomID")
+
 f = ROOT.TFile(options.outname, "RECREATE")
 f.cd()
 
 hzetadist = ROOT.TH1D("hzetadist",";#zeta (#deltaR);;",90,0,4.5)
 hzetaHdist = ROOT.TH1D("hzetaHdist","#zeta;;",90,0,4.5)
 hzetaWdist = ROOT.TH1D("hzetaWdist","#zeta;;",90,0,4.5)
-
+hzetaBackdist = ROOT.TH1D("hzetaBackdist","#zeta;;",90,0,4.5)
 i = 1
 for event in events:
      if (i>options.maxEvts):
@@ -90,8 +98,6 @@ for event in events:
                ih = igen
           if abs(genID.at(igen)) == 24 and abs(genMomID.at(igen)) == 6:
                iW = igen
-     if ih == -1 and iW == -1:
-          continue
 
      ####Creating ordered dictionary to find maximum mass at specific Pt index
      named_map = collections.namedtuple('named_map','mass index')
@@ -122,12 +128,15 @@ for event in events:
      
      ####scaled mass drop variable
      zeta = jetAK4Mass.at(maxak4) / (invMassVec.M()) * ak4p4.DeltaR(ak4p4_2)
+     
+     hzetaBackdist.Fill(zeta)
+     if ih > -1 or iW > -1:
 
-     hzetadist.Fill(zeta)
-     if ih > -1:
-          hzetaHdist.Fill(zeta)
-     if iW > -1:
-          hzetaWdist.Fill(zeta)
+          hzetadist.Fill(zeta)
+          if ih > -1:
+               hzetaHdist.Fill(zeta)
+          if iW > -1:
+               hzetaWdist.Fill(zeta)
 f.cd()
 #hzetadist.Rebin(1)
 f.Write()	
